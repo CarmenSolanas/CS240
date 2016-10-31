@@ -27,7 +27,7 @@ public class BackofSistemCallsnGram {
 			br=new BufferedReader(new FileReader(csvFile));
 			boolean addToList=false;
 			while((line=br.readLine())!=null){
-				String sysCall=line.split(csvSplitBy)[2];
+				String sysCall=line.split(csvSplitBy)[2].replace("\"","");
 				if(addToList){
 					listOfString.add(sysCall);
 				}
@@ -50,17 +50,26 @@ public class BackofSistemCallsnGram {
 		return listOfString;
 	}
 	
-	public static void main(String[] args){
-		ArrayList<String> systemCallTrace=importCSV("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/MIPS-AES-49mips.AES.DDoS.MIPS/syscalls/parsed_MIPS-AES-49mips.AES.DDoS.MIPS.csv");
+	public static Hashtable<String,Integer> nGram(ArrayList<String> systemCallTrace,int n){
 		Hashtable<String,Integer> systemCallTraceFreq=new Hashtable<String,Integer>();
-		for(String item:systemCallTrace){
-			if(systemCallTraceFreq.containsKey(item)){
-				systemCallTraceFreq.put(item, systemCallTraceFreq.get(item)+1);
+		for(int i=0;i<systemCallTrace.size()-n+1;i++){
+			String newString=systemCallTrace.get(i);
+			for(int j=i+1;j<i+n;j++){
+				newString=newString+systemCallTrace.get(j);
+			}
+			if(systemCallTraceFreq.containsKey(newString)){
+				systemCallTraceFreq.put(newString, systemCallTraceFreq.get(newString)+1);
 			}else{
-				systemCallTraceFreq.put(item, 1);	
+				systemCallTraceFreq.put(newString, 1);	
 			}
 		}
-		System.out.println(systemCallTraceFreq);
+		return systemCallTraceFreq;
+	}
+	
+	
+	public static void main(String[] args){
+		ArrayList<String> systemCallTrace=importCSV("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/MIPS-AES-49mips.AES.DDoS.MIPS/syscalls/parsed_MIPS-AES-49mips.AES.DDoS.MIPS.csv");
+		Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
 	}
 	
 }
