@@ -11,11 +11,32 @@ import java.io.IOException;
 
 
 public class BackofSistemCallsnGram {
-	//"C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/MIPS-AES-49mips.AES.DDoS.MIPS/syscalls/parsed_MIPS-AES-49mips.AES.DDoS.MIPS.csv"
+	public static File folder = new File("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/SystemCallTraces");
+	public static List<String> fileList = new ArrayList<String>();
+	
 	
 	
 	/*
-	 * Import the System Call trace 
+	 * Save in a list all the paths of the System Calls traces 
+	 */
+	public static void walk( String path ) {
+        File root = new File( path );
+        File[] list = root.listFiles();
+        if (list == null) return;
+        for ( File f : list ) {
+            if ( f.isDirectory() ) {
+                walk( f.getAbsolutePath() );               
+            }
+            else {
+            	fileList.add(f.getAbsoluteFile().toString());                
+            }
+        }
+    }
+	
+	
+	
+	/*
+	 * For each System Call trace, we are going to save the column with all the system calls 
 	 */
 	public static ArrayList<String> importCSV(String csvFile){
 		BufferedReader br=null;
@@ -50,6 +71,11 @@ public class BackofSistemCallsnGram {
 		return listOfString;
 	}
 	
+	
+	
+	/*
+	 * For each System Call trace, we are going to compute the bag-of-words-n-gram 
+	 */
 	public static Hashtable<String,Integer> nGram(ArrayList<String> systemCallTrace,int n){
 		Hashtable<String,Integer> systemCallTraceFreq=new Hashtable<String,Integer>();
 		for(int i=0;i<systemCallTrace.size()-n+1;i++){
@@ -67,9 +93,23 @@ public class BackofSistemCallsnGram {
 	}
 	
 	
+	
+	/*
+	 * Main 
+	 */
 	public static void main(String[] args){
-		ArrayList<String> systemCallTrace=importCSV("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/MIPS-AES-49mips.AES.DDoS.MIPS/syscalls/parsed_MIPS-AES-49mips.AES.DDoS.MIPS.csv");
-		Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
+		walk(folder.getAbsolutePath());
+		ArrayList<ArrayList<String>> allTraces=new ArrayList<ArrayList<String>>();
+		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
+		for(String item:fileList){
+			ArrayList<String> systemCallTrace=importCSV(item);
+			Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
+			System.out.println(systemCallTraceFreq);
+			allTraces.add(systemCallTrace);
+			allFrequencies.add(systemCallTraceFreq);
+		}
+		
+		
 	}
 	
 }
