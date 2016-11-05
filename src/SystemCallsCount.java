@@ -1,6 +1,7 @@
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -8,9 +9,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 
-public class BackofSistemCallsnGram {
+public class SystemCallsCount {
 	public static File folder = new File("/Users/MrTiriti/Downloads/testMipsSep26/analysis/result/SystemCallTraces");
 	public static List<String> fileList = new ArrayList<String>();
 	
@@ -70,45 +72,29 @@ public class BackofSistemCallsnGram {
 		return listOfString;
 	}
 	
-	
-	
-	/*
-	 * For each System Call trace, we are going to compute the bag-of-words-n-gram 
-	 */
-	public static Hashtable<String,Integer> nGram(ArrayList<String> systemCallTrace,int n){
-		Hashtable<String,Integer> systemCallTraceFreq=new Hashtable<String,Integer>();
-		for(int i=0;i<systemCallTrace.size()-n+1;i++){
-			String newString=systemCallTrace.get(i);
-			for(int j=i+1;j<i+n;j++){
-				newString=newString+systemCallTrace.get(j);
-			}
-			if(systemCallTraceFreq.containsKey(newString)){
-				systemCallTraceFreq.put(newString, systemCallTraceFreq.get(newString)+1);
-			}else{
-				systemCallTraceFreq.put(newString, 1);	
-			}
-		}
-		return systemCallTraceFreq;
-	}
-	
-	
-	
 	/*
 	 * Main 
 	 */
 	public static void main(String[] args){
+		HashSet<String> hs = new HashSet<String>();
 		walk(folder.getAbsolutePath());
-		ArrayList<ArrayList<String>> allTraces=new ArrayList<ArrayList<String>>();
-		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
 		for(String item:fileList){
 			ArrayList<String> systemCallTrace=importCSV(item);
-			Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
-			System.out.println(systemCallTraceFreq);
-			allTraces.add(systemCallTrace);
-			allFrequencies.add(systemCallTraceFreq);
+			for (String item2: systemCallTrace)
+				hs.add(item2);
 		}
+		System.out.println(hs);
+		System.out.println(hs.size());	
 		
-		
+		try{
+		    PrintWriter writer = new PrintWriter("list_of_syscalls.txt", "UTF-8");
+		    for (String item:hs) {
+		    	writer.println(item);
+		    }
+		    writer.close();
+		} catch (Exception e) {
+		   System.out.println("La cagamos");
+		}
 	}
 	
 }
