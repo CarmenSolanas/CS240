@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.Set;
 
 
 public class BackofSistemCallsnGram {
-	public static File folder = new File("/Users/MrTiriti/Downloads/testMipsSep26/analysis/result/SystemCallTraces");
+	//public static File folder = new File("/Users/MrTiriti/Downloads/testMipsSep26/analysis/result/SystemCallTraces");
+	public static File folder = new File("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/SystemCallTraces");
 	public static List<String> fileList = new ArrayList<String>();
+	public static Hashtable<String,Integer> generalFrequencies = new Hashtable<String,Integer>();
 	
 	
 	/*
@@ -87,10 +86,30 @@ public class BackofSistemCallsnGram {
 			}else{
 				systemCallTraceFreq.put(newString, 1);	
 			}
+			if(generalFrequencies.containsKey(newString)){
+				generalFrequencies.put(newString, generalFrequencies.get(newString)+1);
+			}else{
+				generalFrequencies.put(newString, 1);	
+			}
 		}
 		return systemCallTraceFreq;
 	}
 	
+	
+	
+	/*
+	 * TF, part of scaling. 
+	 */
+	public static Hashtable<String,Double> TF(Hashtable<String,Integer> hashtable){
+		Hashtable<String,Double> tf=new Hashtable<String,Double>();
+		Set<String> keyHashTable=hashtable.keySet();
+		for(String item:keyHashTable){
+			int freq=hashtable.get(item);
+			double newFreq=Math.log10((int)(freq+1));
+			tf.put(item, newFreq);
+		}
+		return tf;
+	}
 	
 	
 	/*
@@ -100,14 +119,15 @@ public class BackofSistemCallsnGram {
 		walk(folder.getAbsolutePath());
 		ArrayList<ArrayList<String>> allTraces=new ArrayList<ArrayList<String>>();
 		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
+		ArrayList<Hashtable<String,Double>> allScaling=new ArrayList<Hashtable<String,Double>>();
 		for(String item:fileList){
 			ArrayList<String> systemCallTrace=importCSV(item);
 			Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
-			System.out.println(systemCallTraceFreq);
+			Hashtable<String,Double> systemCallTraceTF=TF(systemCallTraceFreq);
 			allTraces.add(systemCallTrace);
 			allFrequencies.add(systemCallTraceFreq);
+			allScaling.add(systemCallTraceTF);
 		}
-		
 		
 	}
 	
