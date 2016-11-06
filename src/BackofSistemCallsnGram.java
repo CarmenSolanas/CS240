@@ -1,5 +1,3 @@
-package helloworld;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,7 +9,8 @@ import java.util.Set;
 
 public class BackofSistemCallsnGram {
 	//public static File folder = new File("/Users/MrTiriti/Downloads/testMipsSep26/analysis/result/SystemCallTraces");
-	public static File folder = new File("/Users/hyang027/Desktop/240/data");
+	//public static File folder = new File("/Users/hyang027/Desktop/240/data");
+	public static File folder = new File("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/SystemCallTraces");
 	public static List<String> fileList = new ArrayList<String>();
 	public static Hashtable<String,Integer> generalFrequencies = new Hashtable<String,Integer>();
 	
@@ -120,8 +119,6 @@ public class BackofSistemCallsnGram {
 	 */
 	public static Hashtable<String,Double> IDF(){
 		Hashtable<String,Double> idf=new Hashtable<String,Double>();
-		
-	
 		int N=fileList.size();
 		Set<String> keyHashTable=generalFrequencies.keySet();
 		for(String item:keyHashTable){
@@ -131,6 +128,31 @@ public class BackofSistemCallsnGram {
 		}
 		return idf;
 	}
+	
+	
+	/*
+	 * TFIDF, final of scaling. 
+	 */
+	public static ArrayList<Hashtable<String,Double>> TFIDF(ArrayList<Hashtable<String,Double>> listhashtablesTF, Hashtable<String,Double> hashtableIDF){
+		ArrayList<Hashtable<String,Double>> newAllScaling= new ArrayList<Hashtable<String,Double>>();
+		
+		for(Hashtable<String,Double> eachTF:listhashtablesTF){
+			Set<String> keyHashTable=eachTF.keySet();
+			double norm2=0;
+			for(String ngram:keyHashTable){
+				double TFIDF_value = eachTF.get(ngram)*hashtableIDF.get(ngram);
+				eachTF.put(ngram, TFIDF_value);
+				norm2=norm2+Math.pow(TFIDF_value, 2);
+			}
+			norm2=Math.sqrt(norm2);
+			for(String ngram:keyHashTable){
+				eachTF.put(ngram, eachTF.get(ngram)/norm2);
+			}
+		}
+		
+		return newAllScaling;
+	}
+	
 	/*
 	 * Main 
 	 */
@@ -140,36 +162,18 @@ public class BackofSistemCallsnGram {
 		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
 		ArrayList<Hashtable<String,Double>> allScaling=new ArrayList<Hashtable<String,Double>>();
 		
-	
-		
 		for(String item:fileList){
 			ArrayList<String> systemCallTrace=importCSV(item);
 			Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
 			Hashtable<String,Double> systemCallTraceTF=TF(systemCallTraceFreq);
-		   
-		 
 			allTraces.add(systemCallTrace);
 			allFrequencies.add(systemCallTraceFreq);
 			allScaling.add(systemCallTraceTF);
 		}
-		
 
 		Hashtable<String,Double> systemCallTraceIDF= IDF();
+		allScaling=TFIDF(allScaling,systemCallTraceIDF);
 		
-		System.out.print(systemCallTraceIDF);
-		for(Hashtable<String,Double> eachTF:allScaling)
-		{
-			Set<String> keyHashTable=eachTF.keySet();
-			for(String ngram:keyHashTable)
-			{
-				
-				double TFIDF_value = eachTF.get(ngram)*systemCallTraceIDF.get(ngram);
-				eachTF.put(ngram, TFIDF_value);
-			}
-		}
-		System.out.println(allScaling);
-		
-		System.out.println(systemCallTraceIDF);
 	
 	}
 	
