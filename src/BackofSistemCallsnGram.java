@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class BackofSistemCallsnGram {
 	//public static File folder = new File("/Users/MrTiriti/Downloads/testMipsSep26/analysis/result/SystemCallTraces");
-	//public static File folder = new File("/Users/hyang027/Desktop/240/data");
+// 	public static File folder = new File("/Users/hyang027/Desktop/240/data");
 	public static File folder = new File("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/SystemCallTraces");
 	public static List<String> fileList = new ArrayList<String>();
 	public static Hashtable<String,Integer> generalFrequencies = new Hashtable<String,Integer>();
@@ -136,18 +136,25 @@ public class BackofSistemCallsnGram {
 	public static ArrayList<Hashtable<String,Double>> TFIDF(ArrayList<Hashtable<String,Double>> listhashtablesTF, Hashtable<String,Double> hashtableIDF){
 		ArrayList<Hashtable<String,Double>> newAllScaling= new ArrayList<Hashtable<String,Double>>();
 		
+		
 		for(Hashtable<String,Double> eachTF:listhashtablesTF){
+			Hashtable<String,Double>newTable = new Hashtable<String,Double>();
+			
 			Set<String> keyHashTable=eachTF.keySet();
-			double norm2=0;
+			double norm2=0.0;
 			for(String ngram:keyHashTable){
 				double TFIDF_value = eachTF.get(ngram)*hashtableIDF.get(ngram);
-				eachTF.put(ngram, TFIDF_value);
-				norm2=norm2+Math.pow(TFIDF_value, 2);
+				newTable.put(ngram, TFIDF_value);
+				norm2=norm2+Math.pow(TFIDF_value, 2.0);
 			}
+			
+			
 			norm2=Math.sqrt(norm2);
 			for(String ngram:keyHashTable){
-				eachTF.put(ngram, eachTF.get(ngram)/norm2);
+				newTable.put(ngram, newTable.get(ngram)/norm2);
 			}
+			
+			newAllScaling.add(newTable);
 		}
 		
 		return newAllScaling;
@@ -174,7 +181,7 @@ public class BackofSistemCallsnGram {
 		Hashtable<String,Double> systemCallTraceIDF= IDF();
 		allScaling=TFIDF(allScaling,systemCallTraceIDF);
 		
-	
+		System.out.println(allScaling);
 	}
 	
 }
