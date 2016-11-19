@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import Jama.*;
 
 
 public class BackofSistemCallsnGram {
@@ -138,7 +139,7 @@ public class BackofSistemCallsnGram {
 		
 		
 		for(Hashtable<String,Double> eachTF:listhashtablesTF){
-			Hashtable<String,Double>newTable = new Hashtable<String,Double>();
+			Hashtable<String,Double> newTable = new Hashtable<String,Double>();
 			
 			Set<String> keyHashTable=eachTF.keySet();
 			double norm2=0.0;
@@ -168,7 +169,7 @@ public class BackofSistemCallsnGram {
 		ArrayList<ArrayList<String>> allTraces=new ArrayList<ArrayList<String>>();
 		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
 		ArrayList<Hashtable<String,Double>> allScaling=new ArrayList<Hashtable<String,Double>>();
-		
+
 		for(String item:fileList){
 			ArrayList<String> systemCallTrace=importCSV(item);
 			Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
@@ -181,7 +182,34 @@ public class BackofSistemCallsnGram {
 		Hashtable<String,Double> systemCallTraceIDF= IDF();
 		allScaling=TFIDF(allScaling,systemCallTraceIDF);
 		
-		System.out.println(allScaling);
+		
+		
+		Set<String> keySetGF=generalFrequencies.keySet();
+		String[] stringGF=new String[generalFrequencies.size()];
+		int order=0;
+		for(String keys:keySetGF){
+			stringGF[order]=keys;
+			order++;
+		}
+		
+		double[][] beforeSVD=new double[stringGF.length][fileList.size()];
+		
+		for(int j=0;j<fileList.size();j++){
+			Hashtable<String,Double> column=allScaling.get(j);
+			for(int i=0;i<stringGF.length;i++){
+				if(column.containsKey(stringGF[i])){
+					beforeSVD[i][j]=column.get(stringGF[i]);
+				}
+				else{
+					beforeSVD[i][j]=0;
+				}
+			}
+		}
+		
+		Matrix newMatrix=new Matrix(beforeSVD);
+		SingularValueDecomposition svd= new SingularValueDecomposition(newMatrix);
+		
+		
 	}
 	
 }
