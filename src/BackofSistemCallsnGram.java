@@ -161,6 +161,43 @@ public class BackofSistemCallsnGram {
 		return newAllScaling;
 	}
 	
+	
+	/*
+	 * Creating Matrix with zeros to prepare the data set for the classifiers
+	 */
+	public static double[][] prepareDataSet(ArrayList<Hashtable<String,Double>> allScaling){
+		Set<String> keySetGF=generalFrequencies.keySet();
+		String[] stringGF=new String[generalFrequencies.size()];
+		int order=0;
+		for(String keys:keySetGF){
+			stringGF[order]=keys;
+			order++;
+		}
+		
+		double[][] dataset=new double[fileList.size()][stringGF.length+1];
+		
+		for(int i=0;i<fileList.size();i++){
+			Hashtable<String,Double> row=allScaling.get(i);
+			for(int j=0;j<stringGF.length;j++){
+				if(row.containsKey(stringGF[j])){
+					dataset[i][j]=row.get(stringGF[j]);
+				}
+				else{
+					dataset[i][j]=0.0;
+				}
+			}
+			if(i==0){
+				dataset[i][stringGF.length]=0.0;
+			}
+			else{
+				dataset[i][stringGF.length]=1.0;
+			}
+		}
+		return dataset;
+	}
+	
+	
+	
 	/*
 	 * SVD, if we want to use it we have to review the results
 	 */
@@ -240,6 +277,8 @@ public class BackofSistemCallsnGram {
 		allScaling=TFIDF(allScaling,systemCallTraceIDF);
 		
 		//Matrix reducedAllScaling = SVD(allScaling);
+		
+		double[][] dataset=prepareDataSet(allScaling);
 		
 		
 	}
