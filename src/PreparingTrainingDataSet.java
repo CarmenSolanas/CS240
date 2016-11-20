@@ -8,7 +8,7 @@ import java.util.Set;
 import Jama.*;
 
 
-public class BackofSistemCallsnGram {
+public class PreparingTrainingDataSet {
 	//public static File folder = new File("/Users/MrTiriti/Downloads/testMipsSep26/analysis/result/SystemCallTraces");
 // 	public static File folder = new File("/Users/hyang027/Desktop/240/data");
 	public static File folder = new File("C:/Users/lluna/Desktop/mio/Desktop/UCR/Fall16/Network Routing/Project/testMipsSep26/analysis/result/SystemCallTraces");
@@ -252,9 +252,9 @@ public class BackofSistemCallsnGram {
 	
 	
 	/*
-	 * Main 
+	 * Run
 	 */
-	public static void main(String[] args){
+	public static ArrayList<ArrayList<Double>> run(){
 		walk(folder.getAbsolutePath());
 		ArrayList<ArrayList<String>> allTraces=new ArrayList<ArrayList<String>>();
 		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
@@ -276,7 +276,7 @@ public class BackofSistemCallsnGram {
 		
 		ArrayList<ArrayList<Double>> dataset=prepareDataSet(allScaling);
 		
-		
+		return dataset;
 	}
 	
 }
