@@ -162,28 +162,9 @@ public class BackofSistemCallsnGram {
 	}
 	
 	/*
-	 * Main 
+	 * SVD, if we want to use it we have to review the results
 	 */
-	public static void main(String[] args){
-		walk(folder.getAbsolutePath());
-		ArrayList<ArrayList<String>> allTraces=new ArrayList<ArrayList<String>>();
-		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
-		ArrayList<Hashtable<String,Double>> allScaling=new ArrayList<Hashtable<String,Double>>();
-
-		for(String item:fileList){
-			ArrayList<String> systemCallTrace=importCSV(item);
-			Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
-			Hashtable<String,Double> systemCallTraceTF=TF(systemCallTraceFreq);
-			allTraces.add(systemCallTrace);
-			allFrequencies.add(systemCallTraceFreq);
-			allScaling.add(systemCallTraceTF);
-		}
-
-		Hashtable<String,Double> systemCallTraceIDF= IDF();
-		allScaling=TFIDF(allScaling,systemCallTraceIDF);
-		
-		
-		
+	public static Matrix SVD(ArrayList<Hashtable<String,Double>> allScaling){
 		Set<String> keySetGF=generalFrequencies.keySet();
 		String[] stringGF=new String[generalFrequencies.size()];
 		int order=0;
@@ -206,8 +187,59 @@ public class BackofSistemCallsnGram {
 			}
 		}
 		
-		Matrix newMatrix=new Matrix(beforeSVD);
-		SingularValueDecomposition svd= new SingularValueDecomposition(newMatrix);
+		
+		
+		Matrix newMatrix = new Matrix(beforeSVD);
+		SingularValueDecomposition svd = new SingularValueDecomposition(newMatrix);
+		
+		double[] sv=svd.getSingularValues();
+		double sum = 0.0;
+		for (int i=0; i<sv.length; i++) {
+			sum = sum + sv[i];
+		}
+		double[] dvNorm = sv;
+		for (int i=0; i<sv.length; i++) {
+			dvNorm[i] = sv[i] / sum;
+		}
+		double sumDV = 0.0;
+		int iter = 0;
+		while (sumDV <0.75) {
+			sumDV = sumDV + dvNorm[iter];
+			iter ++;
+		}
+		
+		Matrix uk = svd.getU().getMatrix(0, svd.getU().getRowDimension()-1, 0, iter-1);
+		Matrix sk = svd.getU().getMatrix(0, iter-1, 0, iter-1);
+		Matrix partialProduct = sk.times(uk.transpose());
+		Matrix afterSVD = partialProduct.times(newMatrix);
+		
+		return afterSVD;
+	}
+	
+	
+	
+	/*
+	 * Main 
+	 */
+	public static void main(String[] args){
+		walk(folder.getAbsolutePath());
+		ArrayList<ArrayList<String>> allTraces=new ArrayList<ArrayList<String>>();
+		ArrayList<Hashtable<String,Integer>> allFrequencies=new ArrayList<Hashtable<String,Integer>>();
+		ArrayList<Hashtable<String,Double>> allScaling=new ArrayList<Hashtable<String,Double>>();
+
+		for(String item:fileList){
+			ArrayList<String> systemCallTrace=importCSV(item);
+			Hashtable<String,Integer> systemCallTraceFreq=nGram(systemCallTrace,2);
+			Hashtable<String,Double> systemCallTraceTF=TF(systemCallTraceFreq);
+			allTraces.add(systemCallTrace);
+			allFrequencies.add(systemCallTraceFreq);
+			allScaling.add(systemCallTraceTF);
+		}
+
+		Hashtable<String,Double> systemCallTraceIDF= IDF();
+		allScaling=TFIDF(allScaling,systemCallTraceIDF);
+		
+		//Matrix reducedAllScaling = SVD(allScaling);
 		
 		
 	}
