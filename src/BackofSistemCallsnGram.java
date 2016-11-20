@@ -165,7 +165,7 @@ public class BackofSistemCallsnGram {
 	/*
 	 * Creating Matrix with zeros to prepare the data set for the classifiers
 	 */
-	public static double[][] prepareDataSet(ArrayList<Hashtable<String,Double>> allScaling){
+	public static ArrayList<ArrayList<Double>> prepareDataSet(ArrayList<Hashtable<String,Double>> allScaling){
 		Set<String> keySetGF=generalFrequencies.keySet();
 		String[] stringGF=new String[generalFrequencies.size()];
 		int order=0;
@@ -174,24 +174,20 @@ public class BackofSistemCallsnGram {
 			order++;
 		}
 		
-		double[][] dataset=new double[fileList.size()][stringGF.length+1];
+		ArrayList<ArrayList<Double>> dataset=new ArrayList<ArrayList<Double>>();
 		
 		for(int i=0;i<fileList.size();i++){
 			Hashtable<String,Double> row=allScaling.get(i);
+			ArrayList<Double> newRow=new ArrayList<Double>();
 			for(int j=0;j<stringGF.length;j++){
-				if(row.containsKey(stringGF[j])){
-					dataset[i][j]=row.get(stringGF[j]);
+				if(row.containsKey(stringGF[j])){	
+					newRow.add(row.get(stringGF[j]));
 				}
 				else{
-					dataset[i][j]=0.0;
+					newRow.add(0.0);
 				}
 			}
-			if(i==0){
-				dataset[i][stringGF.length]=0.0;
-			}
-			else{
-				dataset[i][stringGF.length]=1.0;
-			}
+			dataset.add(newRow);
 		}
 		return dataset;
 	}
@@ -278,7 +274,7 @@ public class BackofSistemCallsnGram {
 		
 		//Matrix reducedAllScaling = SVD(allScaling);
 		
-		double[][] dataset=prepareDataSet(allScaling);
+		ArrayList<ArrayList<Double>> dataset=prepareDataSet(allScaling);
 		
 		
 	}
