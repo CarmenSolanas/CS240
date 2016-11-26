@@ -14,7 +14,29 @@ public class Classifiers {
 //      PreparingTrainingDataSet a = new PreparingTrainingDataSet();
 //      ArrayList<ArrayList<Double>> trainingSet = a.run();
 
+/*	    
+	   1. print the result to the console
+	   2. copy to sample_array.txt
+	   3. uploads to http://ikuz.eu/csv2arff/ to get a arff format file
+	   4. use the arff format sample_array.txt
+*/
+	    
+// 	int i=0;
+//         for(ArrayList<Double> innerList : trainingSet) {
+//             for(Double number : innerList) {
+//                 System.out.print(number+",");
 
+//             }
+//             if(i==0)
+//                 System.out.print("benigh");
+//             else 
+//                 System.out.print("malware");
+
+//             System.out.println();
+//             i++;
+//         }
+	    
+	    
 	// change to your path  
         File file = new File( "/Users/hyang027/Downloads/sample_array.txt");
 
