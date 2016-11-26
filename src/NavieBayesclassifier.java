@@ -9,7 +9,7 @@ import jsat.classifiers.Classifier;
 import jsat.classifiers.DataPoint;
 import jsat.classifiers.bayesian.NaiveBayes;
 
-public class Classifiers {
+public class NavieBayesclassifier {
     public static void main(String[] args) {
 //      PreparingTrainingDataSet a = new PreparingTrainingDataSet();
 //      ArrayList<ArrayList<Double>> trainingSet = a.run();
